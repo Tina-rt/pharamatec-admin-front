@@ -1,3 +1,17 @@
+<script lang="ts" setup>
+import type { Produits } from '~/types/produits.model';
+
+useHead({
+    title: "Add Product"
+})
+
+const inputImage = ref<HTMLInputElement | null>();
+
+const openImageDialog = () => {
+    inputImage.value?.click();
+};
+</script>
+
 <template>
     <div class="flex flex-col gap-4">
         <h1 class="text-2xl">Ajouter un produit</h1>
@@ -8,16 +22,19 @@
                         <img
                             src="https://via.placeholder.com/150"
                             alt="image"
-                            class="w-full h-full object-cover rounded-xl"
+                            class="w-full h-full object-cover rounded-xl cursor-pointer"
+                            @click="openImageDialog"
                         />
                         <input
                             class="hidden"
                             type="file"
+                            accept="image/*"
                             id="image"
+                            ref="inputImage"
                             name="image"
                         />
                     </div>
-                    <div class="flex-1 flex flex-col gap-2">
+                    <div class="flex-1 flex flex-col gap-2 max-w-[800px]">
                         <div class="flex flex-col">
                             <label for="nom">Nom</label>
                             <input
@@ -65,7 +82,7 @@
                                 />
                             </div>
                         </div>
-                        <div class="flex gap-2 items-center ">
+                        <div class="flex gap-2 items-center">
                             <div class="flex flex-col gap-2 flex-1">
                                 <label for="category">Category</label>
                                 <select
@@ -89,25 +106,17 @@
                                 />
                             </div>
                         </div>
+                        <div class="flex gap-4 mt-5">
+                            <NuxtLink to="/products" class="btn btn-error"
+                                >Annuler</NuxtLink
+                            >
+                            <button class="btn btn-primary">Ajouter</button>
+                        </div>
                     </div>
-                </div>
-
-                <div class="flex justify-end gap-4">
-                    <NuxtLink to="/products" class="btn btn-error"
-                        >Annuler</NuxtLink
-                    >
-                    <button class="btn btn-primary">Ajouter</button>
                 </div>
             </form>
         </div>
     </div>
 </template>
-
-<script lang="ts" setup>
-import { produitsMedicaux } from '~/mock/produits.mock';
-import type { Produits } from '~/types/produits.model';
-
-const productmock = produitsMedicaux;
-</script>
 
 <style></style>

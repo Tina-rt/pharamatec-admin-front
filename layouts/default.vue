@@ -4,13 +4,20 @@
           <Navbar  />
         </div>
         <NavigationMenu style="grid-area: menu" />
-        <div style="grid-area: main" class="pr-4">
+        <div style="grid-area: main" class="pr-4 card bg-base-200 p-4 flex flex-col gap-4">
+
             <slot />
         </div>
     </div>
 </template>
 
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+
+useHead({
+    title: "Pharmatech Dashboard"
+})
+
+</script>
 
 <style lang="css" scoped>
 .main-layout {
