@@ -1,3 +1,5 @@
+import type { Category } from "./category.model";
+
 export interface Produits {
     id?: number;
     nom?: string;
@@ -5,7 +7,7 @@ export interface Produits {
     prix?: number;
     image?: string;
     stock?: number;
-    categorie?: string;
+    categorie?: Category;
     marque?: string;
     numero_serie?: string;
     caracteristique_principale?: string;
