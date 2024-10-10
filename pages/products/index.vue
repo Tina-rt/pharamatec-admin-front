@@ -44,7 +44,7 @@
                 ></Column>
                 <Column field="image" header="Image">
                     <template #body="{ data }">
-                        <NuxtImg
+                        <img
                             :src="$renderImage(data.image)"
                             alt=""
                             class="max-w-28 h-24 max-h-24 object-cover"
