@@ -7,19 +7,98 @@
                     >Ajouter un nouveau produits</NuxtLink
                 >
             </div>
-            <table class="table table-zebra">
+            <DataTable
+                :value="productList"
+                v-model:selection="selectedProduct"
+                v-model:filters="filters"
+                :globalFilterFields="['nom', 'description']"
+                sortMode="multiple"
+            >
+                <template #header>
+                    <div class="flex justify-end">
+                        <IconField>
+                            <InputIcon>
+                                <i class="pi pi-search" />
+                            </InputIcon>
+                            <InputText
+                                v-model="filters['global'].value"
+                                placeholder="Keyword Search"
+                            />
+                        </IconField>
+                    </div>
+                </template>
+                <Column
+                    selectionMode="multiple"
+                    headerStyle="width: 3rem"
+                ></Column>
+                <Column
+                    field="id"
+                    header="Id"
+                    sortable
+                    filter-field="id"
+                ></Column>
+                <Column
+                    field="numero_serie"
+                    header="Numero de serie"
+                    sortable
+                ></Column>
+                <Column field="image" header="Image">
+                    <template #body="{ data }">
+                        <NuxtImg
+                            :src="$renderImage(data.image)"
+                            alt=""
+                            class="max-w-28 h-24 max-h-24 object-cover"
+                        />
+                    </template>
+                </Column>
+                <Column
+                    field="nom"
+                    filter-field="nom"
+                    header="Nom"
+                    sortable
+                ></Column>
+                <Column field="description" header="Description">
+                    <template #body="{ data }">
+                        {{ data.description?.substring(0, 40) }}
+                        {{
+                            data.description && data.description?.length > 40
+                                ? '...'
+                                : ''
+                        }}
+                    </template>
+                </Column>
+                <Column field="prix" header="Prix" sortable></Column>
+                <Column>
+                    <template #body="{data}">
+                        <div class="flex gap-2">
+                            <div class="btn btn-ghost">
+                                <Icon name="mdi-pencil" />
+                            </div>
+                            <div class="btn btn-ghost" @click="handleDelete(data.id!)">
+                                <Icon name="mdi-delete" />
+                            </div>
+                        </div>
+                    </template>
+                </Column>
+            </DataTable>
+            <!-- <table class="table table-zebra">
                 <thead>
                     <tr>
-                        <th>Id</th>
                         <th></th>
+                        <th>Id</th>
+                        <th>Numero de serie</th>
+                        <th>Image</th>
                         <th>Nom</th>
                         <th>Description</th>
                         <th>Prix</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="p in productList">
+                        <td><input type="checkbox" class="checkbox" /></td>
                         <td>{{ p.id }}</td>
+                        <td>{{ p.numero_serie }}</td>
                         <td>
                             <NuxtImg
                                 :src="$renderImage(p.image!)"
@@ -28,24 +107,77 @@
                             />
                         </td>
                         <td>{{ p.nom }}</td>
-                        <td>{{ p.description }}</td>
+                        <td>
+                            {{ p.description?.substring(0, 40) }}
+                            {{ p.description && p.description?.length > 40 ? '...' : '' }}
+                        </td>
                         <td>{{ p.prix }}</td>
+                        <td>
+                            <div class="btn btn-ghost">
+                                <Icon name="mdi-pencil" />
+                            </div>
+                            <div
+                                class="btn btn-ghost"
+                                @click="handleDelete(p.id!)"
+                            >
+                                <Icon name="mdi-delete" />
+                            </div>
+                        </td>
                     </tr>
                 </tbody>
-            </table>
+            </table> -->
+            <Toast
+                v-model="toastMessage.show"
+                :severity="toastMessage.severity"
+                >{{ toastMessage.message }}</Toast
+            >
         </div>
     </div>
 </template>
 
 <script lang="ts" setup>
 import type { Produits } from '~/types/produits.model';
+import { FilterMatchMode } from '@primevue/core/api';
 
 const productList = ref<Produits[]>([]);
 
-getProduitsList().then((data) => {
-    productList.value = [...data];
-    console.log(productList.value);
+const selectedProduct = ref<Produits[]>([]);
+
+const filters = ref({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    nom: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
+
+const toastMessage = ref<{
+    show: boolean;
+    message: string;
+    severity: string;
+    icon: string;
+}>({
+    show: false,
+    message: '',
+    severity: 'info',
+    icon: 'mdi-check',
+});
+
+const refreshProductList = () => {
+    getProduitsList().then((data) => {
+        productList.value = [...data];
+        console.log(productList.value);
+    });
+};
+
+const handleDelete = (pId: number) => {
+    deleteProduits(pId).then((res) => {
+        if (res) {
+            toastMessage.value.message = 'Product deleted succesfully !';
+            toastMessage.value.show = true;
+            refreshProductList();
+        }
+    });
+};
+
+refreshProductList();
 </script>
 
 <style></style>

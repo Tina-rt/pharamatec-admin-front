@@ -107,9 +107,12 @@ const handleSave = async () => {
     }
     if (valid) {
         console.log('Valid');
+        const catTemp = currentProduct.value.categorie;
         currentProduct.value = {
             ...values,
+            categorie: catTemp,
         };
+        
         const res = await addProduits(currentProduct.value, imageFile.value!);
         if (res) {
             showToast.value = true;

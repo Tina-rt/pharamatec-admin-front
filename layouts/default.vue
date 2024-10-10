@@ -1,5 +1,5 @@
 <template>
-    <div class="h-screen main-layout">
+    <div class=" main-layout">
         <div class="p-2 w-full" style="grid-area: nav">
           <Navbar  />
         </div>
@@ -21,6 +21,7 @@ useHead({
 
 <style lang="css" scoped>
 .main-layout {
+    min-height: 100dvh;
     display: grid;
     grid-template-rows: 5rem 1fr;
     grid-template-columns: 15rem 1fr;

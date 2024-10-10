@@ -5,7 +5,7 @@ import type { Produits } from '~/types/produits.model';
 const apiBaseUrl = useRuntimeConfig().public.apiBase;
 export const getProduitsList = async (): Promise<Produits[]> => {
     // const { data } = await axios.get(`${apiBaseUrl}/produit`. {headers: 'Authroizatio'});
-    const { data } = await $api(`produit`);
+    const { data } = await $api(`produit?created_at=desc`);
     return data;
 };
 
@@ -34,3 +34,15 @@ export const addProduits = async (produit: Produits, imageFile: File) => {
         return false;
     }
 };
+
+export const deleteProduits = async (pId: number) => {
+    try{
+        const {data, status} = await $api(`produit/${pId}`, {
+            method: 'DELETE'
+        });
+        return true;
+    } catch(e){
+        console.error(e);
+        return false;
+    }
+}

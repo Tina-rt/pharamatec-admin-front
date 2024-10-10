@@ -25,11 +25,12 @@
                         placeholder="Mot de passe"
                         v-model="password"
                     />
-                    <input
+                    <button
                         type="submit"
                         class="btn btn-primary"
                         value="Submit"
-                    />
+                        :disabled="isLoading"
+                    > <Icon v-if="isLoading" name="mdi-loading" :class="{'animate-spin btn-disabled': isLoading}"/> Se connecter</button>
                 </form>
             </div>
         </div>
@@ -50,11 +51,13 @@ const apiBase = useRuntimeConfig().public.apiBase;
 const error = ref(false);
 const authStore = useMyAuthStore();
 const router = useRouter();
+const isLoading = ref(false);
 
 console.log(apiBase);
 
 const submit = () => {
     error.value = false;
+    isLoading.value = true;
     $api('auth/connexion', {
         headers: {},
         method: 'POST',
@@ -74,6 +77,8 @@ const submit = () => {
         .catch((e) => {
             error.value = true;
             console.log(e);
+        }).finally(()=>{
+            isLoading.value = false;
         });
 };
 </script>
