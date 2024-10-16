@@ -2,53 +2,45 @@
     <div class="card">
         <Chart
             type="bar"
-            :data="chartData"
+            :data="setChartData"
             :options="chartOptions"
             class="h-[30rem]"
         />
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import moment from 'moment';
+
+
+const props = defineProps<{
+    data: any;
+}>();
 
 onMounted(() => {
-    chartData.value = setChartData();
     chartOptions.value = setChartOptions();
 });
 
 const chartData = ref();
 const chartOptions = ref();
 
-const setChartData = () => {
+const setChartData = computed(() => {
     const documentStyle = getComputedStyle(document.documentElement);
 
     return {
-        labels: [
-            'January',
-            'February',
-            'March',
-            'April',
-            'May',
-            'June',
-            'July',
-        ],
+        labels: props.data ? props.data?.map((item: any) => item.label) : [],
         datasets: [
             {
-                label: 'My First dataset',
-                backgroundColor: documentStyle.getPropertyValue('--p-cyan-500'),
-                borderColor: documentStyle.getPropertyValue('--p-cyan-500'),
-                data: [65, 59, 80, 81, 56, 55, 40],
-            },
-            {
-                label: 'My Second dataset',
-                backgroundColor: documentStyle.getPropertyValue('--p-gray-500'),
-                borderColor: documentStyle.getPropertyValue('--p-gray-500'),
-                data: [28, 48, 40, 19, 86, 27, 90],
+                label: 'Les produits les plus commandés',
+                data: props.data ? props.data.map((item: any) => item.value) :[],
+                fill: true,
+                backgroundColor: documentStyle.getPropertyValue('--p-gray-600'),
+                tension: 0.4,
             },
         ],
     };
-};
+});
 const setChartOptions = () => {
     const documentStyle = getComputedStyle(document.documentElement);
     const textColor = documentStyle.getPropertyValue('--p-text-color');
@@ -77,6 +69,8 @@ const setChartOptions = () => {
                     font: {
                         weight: 500,
                     },
+                    stepSize: 1,
+
                 },
                 grid: {
                     display: false,

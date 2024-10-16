@@ -13,6 +13,8 @@
                 v-model:filters="filters"
                 :globalFilterFields="['nom', 'description']"
                 sortMode="multiple"
+                :loading="dataIsLoading"
+                scrollHeight="500px"
             >
                 <template #header>
                     <div class="flex justify-end">
@@ -67,65 +69,30 @@
                         }}
                     </template>
                 </Column>
-                <Column field="prix" header="Prix" sortable></Column>
+                <Column field="prix" header="Prix" sortable>
+                    <template #body="{ data }">
+                        <div>
+                            {{ $formatCurrency(data.prix, true) }}
+                        </div>
+                    </template>
+                </Column>
                 <Column>
-                    <template #body="{data}">
+                    <template #body="{ data }">
                         <div class="flex gap-2">
                             <div class="btn btn-ghost">
                                 <Icon name="mdi-pencil" />
                             </div>
-                            <div class="btn btn-ghost" @click="handleDelete(data.id!)">
+                            <div
+                                class="btn btn-ghost"
+                                @click="handleDelete(data.id!)"
+                            >
                                 <Icon name="mdi-delete" />
                             </div>
                         </div>
                     </template>
                 </Column>
             </DataTable>
-            <!-- <table class="table table-zebra">
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th>Id</th>
-                        <th>Numero de serie</th>
-                        <th>Image</th>
-                        <th>Nom</th>
-                        <th>Description</th>
-                        <th>Prix</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="p in productList">
-                        <td><input type="checkbox" class="checkbox" /></td>
-                        <td>{{ p.id }}</td>
-                        <td>{{ p.numero_serie }}</td>
-                        <td>
-                            <NuxtImg
-                                :src="$renderImage(p.image!)"
-                                alt=""
-                                class="max-w-28 h-24 max-h-24 object-cover"
-                            />
-                        </td>
-                        <td>{{ p.nom }}</td>
-                        <td>
-                            {{ p.description?.substring(0, 40) }}
-                            {{ p.description && p.description?.length > 40 ? '...' : '' }}
-                        </td>
-                        <td>{{ p.prix }}</td>
-                        <td>
-                            <div class="btn btn-ghost">
-                                <Icon name="mdi-pencil" />
-                            </div>
-                            <div
-                                class="btn btn-ghost"
-                                @click="handleDelete(p.id!)"
-                            >
-                                <Icon name="mdi-delete" />
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table> -->
+
             <Toast
                 v-model="toastMessage.show"
                 :severity="toastMessage.severity"
@@ -142,6 +109,7 @@ import { FilterMatchMode } from '@primevue/core/api';
 const productList = ref<Produits[]>([]);
 
 const selectedProduct = ref<Produits[]>([]);
+const dataIsLoading = ref(true);
 
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -161,10 +129,18 @@ const toastMessage = ref<{
 });
 
 const refreshProductList = () => {
-    getProduitsList().then((data) => {
-        productList.value = [...data];
-        console.log(productList.value);
-    });
+    getProduitsList()
+        .then((data) => {
+            productList.value = [...data];
+            console.log(productList.value);
+        })
+        .catch((e) => {
+            toastMessage.value.message = "Une erreur s'est produite";
+            toastMessage.value.show = true;
+        })
+        .finally(() => {
+            dataIsLoading.value = false;
+        });
 };
 
 const handleDelete = (pId: number) => {

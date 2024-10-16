@@ -2,7 +2,31 @@
     <div class="p-4">
         <h1 class="text-3xl">Les clients</h1>
         <div class="pt-5">
-            <table class="table">
+            <DataTable
+                :value="clientList"
+                v-model:filters="filters"
+                :globalFilterFields="['nom', 'email', 'phone']"
+                scrollHeight="500px"
+            >
+                <template #header>
+                    <div class="flex justify-end">
+                        <IconField>
+                            <InputIcon>
+                                <i class="pi pi-search" />
+                            </InputIcon>
+                            <InputText
+                                v-model="filters['global'].value"
+                                placeholder="Keyword Search"
+                            />
+                        </IconField>
+                    </div>
+                </template>
+                <Column field="id" header="Id"></Column>
+                <Column field="nom" header="Nom"></Column>
+                <Column field="phone" header="Telephone"></Column>
+                <Column field="email" header="Email"></Column>
+            </DataTable>
+            <!-- <table class="table">
                 <thead>
                     <tr>
                         <th>
@@ -27,18 +51,25 @@
                         <td>{{ client.email }}</td>
                     </tr>
                 </tbody>
-            </table>
+            </table> -->
         </div>
     </div>
 </template>
 
 <script lang="ts" setup>
 import type { User } from '~/types/user.models';
+import { FilterMatchMode } from '@primevue/core/api';
 
 const clientList = ref<User[]>([]);
 
+const filters = ref({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    nom: { value: null, matchMode: FilterMatchMode.CONTAINS },
+});
+
 getAllClients().then((data) => {
     clientList.value = data;
+    console.log(data);
 });
 </script>
 
