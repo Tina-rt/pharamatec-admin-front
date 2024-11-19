@@ -58,7 +58,7 @@ console.log(apiBase);
 const submit = () => {
     error.value = false;
     isLoading.value = true;
-    $api('auth/connexion', {
+    $api('auth/connexion/admin', {
         headers: {},
         method: 'POST',
         body: {

@@ -1,3 +1,7 @@
+import fileDownload from 'js-file-download'
+
+
+
 export const $api = async (
     url: string,
     options?: Parameters<typeof $fetch>[1],
@@ -19,3 +23,14 @@ export const $renderImage = (imgPath: string): string => {
     const newUrl = new URL(`${apiParent}/${imgPath}`);
     return newUrl.toString();
 };
+
+export const $downloadFile = (path:string, filename:string) => {
+
+    $api(path).then((res) => {
+        // console.log(res)
+        fileDownload(res, filename)
+    })
+
+
+}
+

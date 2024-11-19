@@ -2,6 +2,11 @@
     <div class="p-4">
         <h1 class="text-3xl">Les clients</h1>
         <div class="pt-5">
+            <div class="p-2">
+                <div class="flex justify-end">
+                    <div @click="exportCustomer" class="btn btn-accent"><Icon name="mdi-export" /> Export</div>
+                </div>
+            </div>
             <DataTable
                 :value="clientList"
                 v-model:filters="filters"
@@ -16,7 +21,7 @@
                             </InputIcon>
                             <InputText
                                 v-model="filters['global'].value"
-                                placeholder="Keyword Search"
+                                placeholder="Rechercher"
                             />
                         </IconField>
                     </div>
@@ -53,14 +58,17 @@
                 </tbody>
             </table> -->
         </div>
+        <Toast />
     </div>
 </template>
 
 <script lang="ts" setup>
 import type { User } from '~/types/user.models';
 import { FilterMatchMode } from '@primevue/core/api';
+import fileDownload from 'js-file-download'
 
 const clientList = ref<User[]>([]);
+const toast = useToast()
 
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -71,6 +79,15 @@ getAllClients().then((data) => {
     clientList.value = data;
     console.log(data);
 });
+
+const exportCustomer = () => {
+    $downloadFile('utilisateur/export/client', 'Clients.csv');
+    toast.add({
+        summary: 'Export effectué avec succès',
+        severity: 'success',
+        life: 2000,
+    })
+}
 </script>
 
 <style></style>

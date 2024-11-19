@@ -2,7 +2,10 @@
     <div class="flex flex-col gap-4 p-4">
         <h1 class="text-2xl">Produits</h1>
         <div class="card bg-base-200 p-4 flex flex-col gap-4">
-            <div class="w-full flex justify-end">
+            <div class="w-full flex justify-between gap-4">
+                <div class="btn btn-accent" @click="exportProduit">
+                    <Icon name="mdi-export" /> Export
+                </div>
                 <NuxtLink to="/products/add" class="btn btn-primary"
                     >Ajouter un nouveau produits</NuxtLink
                 >
@@ -15,6 +18,7 @@
                 sortMode="multiple"
                 :loading="dataIsLoading"
                 scrollHeight="500px"
+                @row-dblclick="handleRowClick"
             >
                 <template #header>
                     <div class="flex justify-end">
@@ -24,7 +28,7 @@
                             </InputIcon>
                             <InputText
                                 v-model="filters['global'].value"
-                                placeholder="Keyword Search"
+                                placeholder="Rechercher"
                             />
                         </IconField>
                     </div>
@@ -59,6 +63,8 @@
                     header="Nom"
                     sortable
                 ></Column>
+                <Column field="categorie.nom" header="Categorie" sortable>
+                </Column>
                 <Column field="description" header="Description">
                     <template #body="{ data }">
                         {{ data.description?.substring(0, 40) }}
@@ -79,7 +85,10 @@
                 <Column>
                     <template #body="{ data }">
                         <div class="flex gap-2">
-                            <div class="btn btn-ghost">
+                            <div
+                                class="btn btn-ghost"
+                                @click="handleEdit(+data.id)"
+                            >
                                 <Icon name="mdi-pencil" />
                             </div>
                             <div
@@ -93,11 +102,7 @@
                 </Column>
             </DataTable>
 
-            <Toast
-                v-model="toastMessage.show"
-                :severity="toastMessage.severity"
-                >{{ toastMessage.message }}</Toast
-            >
+            <Toast />
         </div>
     </div>
 </template>
@@ -115,6 +120,9 @@ const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     nom: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
+
+const toast = useToast();
+const router = useRouter();
 
 const toastMessage = ref<{
     show: boolean;
@@ -135,8 +143,10 @@ const refreshProductList = () => {
             console.log(productList.value);
         })
         .catch((e) => {
-            toastMessage.value.message = "Une erreur s'est produite";
-            toastMessage.value.show = true;
+            toast.add({
+                summary: "Une erreur s'est produite",
+                severity: 'error',
+            });
         })
         .finally(() => {
             dataIsLoading.value = false;
@@ -146,10 +156,30 @@ const refreshProductList = () => {
 const handleDelete = (pId: number) => {
     deleteProduits(pId).then((res) => {
         if (res) {
-            toastMessage.value.message = 'Product deleted succesfully !';
-            toastMessage.value.show = true;
+            toast.add({
+                summary: 'Product deleted succesfully !',
+                severity: 'info',
+            });
             refreshProductList();
         }
+    });
+};
+
+const handleRowClick = (data: any) => {
+    const { data: currPr } = data;
+    router.push(`/products/${currPr.id}`);
+};
+
+const handleEdit = (prId: number) => {
+    router.push(`/products/${prId}`);
+};
+
+const exportProduit = () => {
+    $downloadFile('produit/export', 'Export Produits.csv');
+    toast.add({
+        summary: 'Export effectué avec succès',
+        severity: 'success',
+        life: 2000,
     });
 };
 

@@ -1,6 +1,11 @@
 <template>
     <div class="p-4">
         <h1 class="text-3xl">Commandes</h1>
+        <div class="py-4 flex justify-end w-full">
+            <div class="btn btn-accent" @click="exportOrder">
+                <Icon name="mdi-export" /> Export
+            </div>
+        </div>
         <div class="pt-5 flex flex-col gap-3">
             <!-- <template v-if="orderList.size === 0"> -->
             <Tabs value="0">
@@ -127,8 +132,7 @@
                                 :loading="isLoading"
                                 @row-click="handleRowClick"
                                 row-hover
-                scrollHeight="500px"
-
+                                scrollHeight="500px"
                             >
                                 <Column
                                     header="Order id"
@@ -181,6 +185,7 @@
                                 :loading="isLoading"
                                 @row-click="handleRowClick"
                                 row-hover
+                                scrollHeight="500px"
                             >
                                 <Column
                                     header="Order id"
@@ -269,6 +274,8 @@
         <!-- <div v-else class="w-full flex justify-center p-3">
             <Icon name="mdi-loading" class="animate-spin" size="50" />
         </div> -->
+        <Toast />
+
     </div>
 </template>
 
@@ -278,6 +285,7 @@ import { useMyOrderStoreStore } from '~/store/orderStore';
 import type { UserOrder } from '~/types/orderItem.models';
 
 const router = useRouter();
+const toast = useToast();
 const orderStore = useMyOrderStoreStore();
 const orderList = ref<UserOrder[]>([]);
 
@@ -316,6 +324,16 @@ onMounted(() => {
             isLoading.value = false;
         });
 });
+
+const exportOrder = () => {
+    const now = new Date();
+    $downloadFile('commande/export', `commande du ${now.getDay()}-${now.getMonth()}-${now.getFullYear()}.csv`);
+    toast.add({
+        summary: 'Export effectué avec succès',
+        severity: 'success',
+        life: 2000,
+    })
+};
 </script>
 
 <style></style>
